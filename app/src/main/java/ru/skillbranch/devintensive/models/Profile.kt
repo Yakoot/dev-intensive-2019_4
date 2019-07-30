@@ -8,11 +8,11 @@ data class Profile(
     val rating: Int = 0,
     val respect: Int = 0
 ) {
-    val nicName: String = "John Doe"
+    val nickName: String = "John Doe"
     val rank: String = "Junior Android Developer"
 
     fun toMap(): Map<String, Any> = mapOf(
-        "nicName" to nicName,
+        "nicName" to nickName,
         "rank" to rank,
         "firstName" to firstName,
         "lastName" to lastName,
