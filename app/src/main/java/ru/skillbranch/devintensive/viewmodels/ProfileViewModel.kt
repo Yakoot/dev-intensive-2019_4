@@ -1,4 +1,4 @@
-package ru.skillbranch.devintensive.viewModels
+package ru.skillbranch.devintensive.viewmodels
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
