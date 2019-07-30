@@ -20,9 +20,9 @@ class ProfileActivity : AppCompatActivity() {
         const val IS_EDIT_MODE = "IS_EDIT_MODE"
     }
 
-    var isEditMode = false
+    private var isEditMode = false
     private lateinit var viewModel: ProfileViewModel
-    lateinit var viewFields: Map<String, TextView>
+    private lateinit var viewFields: Map<String, TextView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +65,8 @@ class ProfileActivity : AppCompatActivity() {
 
 
         btn_edit.setOnClickListener {
-            isEditMode = !isEditMode
             if (isEditMode) saveProfileInfo()
+            isEditMode = !isEditMode
             showCurrentMode(isEditMode)
         }
 
