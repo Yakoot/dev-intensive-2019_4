@@ -16,7 +16,7 @@
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintDimensionRatio="16:9"
             android:contentDescription="@string/profile_background_contend_description" android:scaleType="centerCrop"/>
-    <ImageView
+    <ru.skillbranch.devintensive.ui.custom.CircleImageView
             android:layout_width="@dimen/avatar_round_size"
             android:layout_height="@dimen/avatar_round_size"
             android:src="@drawable/avatar_default"
