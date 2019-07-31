@@ -59,10 +59,10 @@ object Utils {
         val dict : MutableMap<String, String> = dictionary
         dict[" "] = divider
         var newStr = ""
-        payload.forEach { letter: Char ->
+        payload.trim().forEach { letter: Char ->
             val lowerLetter = letter.toLowerCase()
             val newLetter = if (dict.containsKey(lowerLetter.toString())) dict[lowerLetter.toString()] else lowerLetter
-            newStr += if (letter.isUpperCase()) newLetter.toString().toUpperCase() else newLetter
+            newStr += if (letter.isUpperCase()) newLetter.toString().capitalize() else newLetter
         }
         return newStr
     }
