@@ -72,7 +72,6 @@ class ProfileActivity : AppCompatActivity() {
             val valid = viewModel.repositoryValid.value ?: false
             if (isEditMode && !valid) {
                 et_repository.text = null
-                return@setOnClickListener
             }
             if (isEditMode) saveProfileInfo()
             isEditMode = !isEditMode
