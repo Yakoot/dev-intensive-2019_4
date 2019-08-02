@@ -5,6 +5,9 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.Observer
@@ -66,6 +69,11 @@ class ProfileActivity : AppCompatActivity() {
 
 
         btn_edit.setOnClickListener {
+            val valid = viewModel.repositoryValid.value ?: false
+            if (isEditMode && !valid) {
+                et_repository.text = null
+                return@setOnClickListener
+            }
             if (isEditMode) saveProfileInfo()
             isEditMode = !isEditMode
             showCurrentMode(isEditMode)
@@ -74,6 +82,25 @@ class ProfileActivity : AppCompatActivity() {
         btn_switch_theme.setOnClickListener {
             viewModel.switchTheme()
         }
+
+        et_repository.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                onChangeRepository(p0)
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+        })
+
+        viewModel.repositoryValid.observe(this, Observer {
+            wr_repository.isErrorEnabled = !it
+            wr_repository.error = if (!it && isEditMode) "Невалидный адрес репозитория" else ""
+        })
+    }
+
+    private fun onChangeRepository(text: Editable?) {
+        viewModel.validateRepository(text.toString())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
