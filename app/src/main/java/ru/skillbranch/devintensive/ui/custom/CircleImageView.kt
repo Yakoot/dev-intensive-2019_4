@@ -17,12 +17,7 @@ import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import kotlin.math.min
 import android.graphics.BitmapShader
-
-
-
-
-
-
+import android.util.TypedValue
 
 
 class CircleImageView @JvmOverloads constructor (
@@ -42,20 +37,7 @@ class CircleImageView @JvmOverloads constructor (
     private var borderColor = Color.WHITE
     private var borderWidth = 2.px
 
-
-    private lateinit var mBitmapShader: Shader
-    private var mShaderMatrix: Matrix
-
-    private var mBitmapDrawBounds: RectF
-    private var mStrokeBounds: RectF
-
-    private var mBitmap: Bitmap? = null
-
-    private var mBitmapPaint: Paint
-    private var mStrokePaint: Paint
-
-    private var mInitialized: Boolean = false
-
+    private var lastText: String? = null
 
     init {
         if (attrs != null) {
@@ -64,19 +46,6 @@ class CircleImageView @JvmOverloads constructor (
             borderWidth = attrVal.getDimensionPixelSize(R.styleable.CircleImageView_cv_borderWidth, borderWidth)
             attrVal.recycle()
         }
-        mShaderMatrix = Matrix()
-        mBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mStrokeBounds = RectF()
-        mBitmapDrawBounds = RectF()
-        mStrokePaint.color = borderColor
-        mStrokePaint.style = Paint.Style.STROKE
-        mStrokePaint.strokeWidth = borderWidth.toFloat()
-
-        mInitialized = true
-
-        setupBitmap()
-
     }
 
     @Dimension
@@ -99,125 +68,134 @@ class CircleImageView @JvmOverloads constructor (
         this.invalidate()
     }
 
-    private fun setupBitmap() {
-        if (!mInitialized) {
-            return
-        }
-        mBitmap = getBitmapFromDrawable(drawable)
-        if (mBitmap == null) {
-            return
-        }
 
-        mBitmapShader = BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-        mBitmapPaint.shader = mBitmapShader
 
-        updateBitmapSize()
+
+    fun generateAvatar(text: String?, size: Int, theme: Resources.Theme) {
+        if (text != lastText) {
+            var image = generateDefaultAvatar(theme)
+            if (text != null) {
+                image = generateLettersAvatar(text, size, image)
+            }
+            lastText = text
+            setImageBitmap(image)
+        }
     }
 
-    private fun updateBitmapSize() {
-        if (mBitmap == null) return
+    private fun generateLettersAvatar(text: String, size: Int, image: Bitmap): Bitmap {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        // trainslate bitmap in the BitmapShader using dx and dy so that it's centered
-        val dx: Float
-        val dy: Float
+        paint.textSize = size * context.resources.displayMetrics.scaledDensity
+        paint.color = Color.WHITE
+        paint.textAlign = Paint.Align.CENTER
 
-        // scale factor
-        val scale: Float
+        val textBounds = Rect()
+        paint.getTextBounds(text, 0, text.length, textBounds)
 
-        // scale up/down with respect to this view size and maintain aspect ratio
-        // translate bitmap position with dx/dy to the center of the image
-        //
-        // check do we want to scale based on width or height
-        if (mBitmap!!.width < mBitmap!!.height) {
-            // if bitmp with is less than its height, we wanna scale based on its width
-            // assign scale factor based on difference (ratio) between bitmap width and bitmap draw bounds
-            scale = mBitmapDrawBounds.width() / mBitmap!!.width as Float
-            // because we know that the scale was based on width, the width would fit
-            // exaclty with bounds, so we just translate x with its left padding
-            dx = mBitmapDrawBounds.left
-            // we want to center y(height) axis of the scaled bitmap,
-            // the logial way to see this is:
-            // at the first state bitmap would rendered at the top left area
-            // by translating with top padding of the view,
-            // translate up by half of bitmap height (so center of bitmap now in the top of the view),
-            // translate down by half of the bitmap bounds (so center of bitmap would be in the center of the view (bitmap bounds))
-            dy = mBitmapDrawBounds.top - mBitmap!!.height * scale / 2f + mBitmapDrawBounds.width() / 2f
-        } else {
-            // the same concept goes the same here, the difference is we
-            // translate (center) horizontal axis instead of vertical/y axis
-            scale = mBitmapDrawBounds.height() / mBitmap!!.height.toFloat()
-            dx = mBitmapDrawBounds.left - mBitmap!!.width * scale / 2f + mBitmapDrawBounds.width() / 2f
-            dy = mBitmapDrawBounds.top
-        }
+        val backgroundBounds = RectF()
+        backgroundBounds.set(0f, 0f, layoutParams.height.toFloat(), layoutParams.height.toFloat())
 
-        // apply this transformation into shader matrix -> bitmap shader
-        mShaderMatrix.setScale(scale, scale)
-        mShaderMatrix.postTranslate(dx, dy)
-        mBitmapShader.setLocalMatrix(mShaderMatrix)
+        val textBottom = backgroundBounds.centerY() - textBounds.exactCenterY()
+        val canvas = Canvas(image)
+        canvas.drawText(text, backgroundBounds.centerX(), textBottom, paint)
+
+        return image
+
     }
 
-    private fun getBitmapFromDrawable(drawable: Drawable?): Bitmap? {
-        if (drawable == null) {
+    private fun generateDefaultAvatar(theme: Resources.Theme): Bitmap {
+        val image = Bitmap.createBitmap(layoutParams.height, layoutParams.height, Bitmap.Config.ARGB_8888)
+        val color = TypedValue()
+        theme.resolveAttribute(R.attr.colorAccent, color, true)
+
+
+        val canvas = Canvas(image)
+        canvas.drawColor(color.data)
+
+        return image
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        var bitmap = getBitmapFromDrawable() ?: return
+        if (width == 0 || height == 0) return
+
+        bitmap = getScaledBitmap(bitmap, width)
+        bitmap = getCenterCroppedBitmap(bitmap, width)
+        bitmap = getCircleBitmap(bitmap)
+
+        if (borderWidth > 0)
+            bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
+
+        canvas.drawBitmap(bitmap, 0F, 0F, null)
+    }
+
+    private fun getBitmapFromDrawable(): Bitmap? {
+        if (drawable == null)
             return null
-        }
 
-        if (drawable is BitmapDrawable) {
-            return drawable.bitmap
-        }
+        if (drawable is BitmapDrawable)
+            return (drawable as BitmapDrawable).bitmap
 
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
 
         return bitmap
     }
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        updateCircleDrawBounds(mBitmapDrawBounds)
+
+    private fun getScaledBitmap(bitmap: Bitmap, width: Int): Bitmap {
+        return if (bitmap.width != width || bitmap.height != width) {
+            val smallest = min(bitmap.width, bitmap.height).toFloat()
+            val factor = smallest / width
+            Bitmap.createScaledBitmap(bitmap, (bitmap.width / factor).toInt(), (bitmap.height / factor).toInt(), false)
+        } else bitmap
     }
 
-    private fun updateCircleDrawBounds(bounds: RectF) {
-        val contentWidth = (width - paddingLeft - paddingRight).toFloat()
-        val contentHeight = (height - paddingTop - paddingBottom).toFloat()
+    private fun getCenterCroppedBitmap(bitmap: Bitmap, size: Int): Bitmap {
+        val cropStartX = (bitmap.width - size) / 2
+        val cropStartY = (bitmap.height - size) / 2
 
-        var left = paddingLeft.toFloat()
-        var top = paddingTop.toFloat()
+        return Bitmap.createBitmap(bitmap, cropStartX, cropStartY, size, size)
+    }
 
-        // we'll center bounds by translating left/top
-        // so that the rendered circle always in the center of view
-        if (contentWidth > contentHeight) {
-            left += (contentWidth - contentHeight) / 2f
-        } else {
-            top += (contentHeight - contentWidth) / 2f
-        }
+    private fun getCircleBitmap(bitmap: Bitmap): Bitmap {
+        val smallest = min(bitmap.width, bitmap.height)
+        val outputBmp = Bitmap.createBitmap(smallest, smallest, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(outputBmp)
 
-        // we want to make this bounds always square (aspect ratio of 1:1)
-        val diameter = min(contentWidth, contentHeight)
-        bounds.set(left, top, left + diameter, top + diameter)
+        val paint = Paint()
+        val rect = Rect(0, 0, smallest, smallest)
+
+        paint.isAntiAlias = true
+        paint.isFilterBitmap = true
+        paint.isDither = true
+        canvas.drawARGB(0, 0, 0, 0)
+        canvas.drawCircle(smallest / 2F, smallest / 2F, smallest / 2F, paint)
+
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+
+        return outputBmp
+    }
+
+    private fun getStrokedBitmap(squareBmp: Bitmap, strokeWidth: Int, color: Int): Bitmap {
+        val inCircle = RectF()
+        val strokeStart = strokeWidth / 2F
+        val strokeEnd = squareBmp.width - strokeWidth / 2F
+
+        inCircle.set(strokeStart , strokeStart, strokeEnd, strokeEnd)
+
+        val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        strokePaint.color = color
+        strokePaint.style = Paint.Style.STROKE
+        strokePaint.strokeWidth = strokeWidth.toFloat()
+
+        val canvas = Canvas(squareBmp)
+        canvas.drawOval(inCircle, strokePaint)
+
+        return squareBmp
     }
 
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        drawBitmap(canvas)
-        drawStroke(canvas)
-    }
-
-    private fun drawStroke(canvas: Canvas) {
-        if (mStrokePaint.strokeWidth > 0f) {
-            canvas.drawOval(mStrokeBounds, mStrokePaint)
-        }
-    }
-
-    private fun drawBitmap(canvas: Canvas) {
-        // we draw an oval shape using draw bounds that we have set to always square and it would draw a circle in it
-        // also the bitmap paint is set with the bitmap shader so the color
-        // of the shape is the bitmap itself
-        canvas.drawOval(mBitmapDrawBounds, mBitmapPaint)
-    }
 }
