@@ -54,6 +54,6 @@ class GroupViewModel : ViewModel() {
     }
 
     fun handleCreateGroup() {
-//        groupRepository.createChat(selectedItems.value!!)
+        groupRepository.createChat(selectedItems.value!!)
     }
 }

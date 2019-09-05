@@ -5,6 +5,7 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.children
@@ -28,20 +29,31 @@ class GroupActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_search, menu)
         val searchItem = menu?.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        val searchView = searchItem?.actionView as SearchView
         searchView.queryHint = "Введите имя пользователя"
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
+            override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.handleSearchQuery(query)
                 return true
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            override fun onQueryTextChange(newText: String): Boolean {
+                viewModel.handleSearchQuery(newText)
+                return true
             }
 
         })
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return if (item?.itemId == android.R.id.home) {
+            finish()
+//            overridePendingTransition(R.anim.idle, R.anim.bottom_down)
+            true
+        } else {
+            super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +67,7 @@ class GroupActivity : AppCompatActivity() {
 
     private fun initToolbar() {
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initViews() {
@@ -66,6 +79,12 @@ class GroupActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@GroupActivity)
             addItemDecoration(divider)
         }
+
+        fab.setOnClickListener {
+            viewModel.handleCreateGroup()
+            finish()
+//            overridePendingTransition(R.anim.idle, R.anim.bottom_down)
+        }
     }
 
     private fun initViewModel() {
@@ -74,7 +93,15 @@ class GroupActivity : AppCompatActivity() {
             usersAdapter.updateData(it)
         })
 
-        viewModel.getSelectedData().observe(this, Observer { updateChips(it) })
+        viewModel.getSelectedData().observe(this, Observer {
+            updateChips(it)
+            toggleFab(it.size > 1)
+        })
+    }
+
+    private fun toggleFab(isShow: Boolean) {
+        if (isShow) fab.show()
+        else fab.hide()
     }
 
     private fun addChipToGroup(user: UserItem) {
