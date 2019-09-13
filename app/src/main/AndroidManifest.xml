@@ -16,6 +16,9 @@
         <activity
                 android:name=".ui.group.GroupActivity"
                 android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.archive.ArchiveActivity"
+            android:theme="@style/AppTheme" />
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
