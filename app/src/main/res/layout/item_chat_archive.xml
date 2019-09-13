@@ -48,7 +48,7 @@
         android:textColor="@color/color_gray_dark"
         android:textSize="14sp"
         android:layout_below="@id/tv_title_archive"
-        android:layout_toRightOf="@id/tv_message_author"
+        android:layout_toRightOf="@id/tv_message_author_archive"
         android:layout_marginRight="@dimen/spacing_normal_16"/>
 
     <TextView
