@@ -58,6 +58,25 @@ data class Chat(
             )
         }
     }
+
+    companion object {
+        fun createArchiveChatItem(archivedChats: List<Chat>): ChatItem {
+            val lastChat = archivedChats.maxBy { it.lastMessageDate() as Date }
+            val counter = archivedChats.sumBy { it.unreadableMessageCount() }
+            return ChatItem(
+                    id = "-1",
+                    avatar = null,
+                    initials = "",
+                    title = "Архив чатов",
+                    shortDescription = lastChat?.lastMessageShort()?.first,
+                    messageCount = counter,
+                    lastMessageDate = lastChat?.lastMessageDate()?.shortFormat(),
+                    isOnline = false,
+                    chatType = ChatType.ARCHIVE,
+                    author = "@${lastChat?.lastMessageShort()?.second}"
+            )
+        }
+    }
 }
 
 
