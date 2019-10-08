@@ -119,7 +119,7 @@ class GroupActivity : AppCompatActivity() {
         chip_group.addView(chip)
     }
 
-    fun updateChips(listUsers: List<UserItem>) {
+    private fun updateChips(listUsers: List<UserItem>) {
         chip_group.visibility = if(listUsers.isEmpty()) View.GONE else View.VISIBLE
 
         val users = listUsers
@@ -134,6 +134,5 @@ class GroupActivity : AppCompatActivity() {
         }
 
         users.forEach { (_,v) -> addChipToGroup(v) }
-
     }
 }
