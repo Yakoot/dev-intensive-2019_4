@@ -4,10 +4,6 @@
         <attr name="aspectRatio" format="float"/>
     </declare-styleable>
 
-    <attr name="colorAccentedSurface" format="reference"/>
-    <attr name="colorDivider" format="reference"/>
-    <attr name="colorIcon" format="reference"/>
-
     <declare-styleable name="CircleImageView">
         <attr name="cv_borderColor" format="reference"/>
         <attr name="cv_borderWidth" format="dimension"/>
@@ -20,4 +16,25 @@
         <attr name="aiv_borderWidth" format="dimension"/>
     </declare-styleable>
 
+    <attr name="colorBackground" format="reference"/>
+    <attr name="colorAccentedSurface" format="reference"/>
+    <attr name="colorDivider" format="reference"/>
+    <attr name="colorIcon" format="reference"/>
+    <attr name="colorToolbar" format="reference"/>
+    <attr name="colorIndicator" format="reference"/>
+    <attr name="colorItemBackground" format="reference"/>
+    <attr name="colorCounter" format="reference"/>
+    <attr name="colorChatTitle" format="reference"/>
+    <attr name="colorChatText" format="reference"/>
+    <attr name="colorItemSelected" format="reference"/>
+    <attr name="colorChatAuthorMessage" format="reference"/>
+    <attr name="colorIconDone" format="reference"/>
+    <attr name="colorChipBackground" format="reference"/>
+    <attr name="colorChipCloseIcon" format="reference"/>
+    <attr name="colorArchivedBackground" format="reference"/>
+    <attr name="colorArchiveIcon" format="reference"/>
+    <attr name="colorArchiveOnSwipe" format="reference"/>
+    <attr name="colorSnackbarBackground" format="reference"/>
+    <attr name="colorSnackbarAction" format="reference"/>
+    <attr name="colorSnackbarText" format="reference"/>
 </resources>

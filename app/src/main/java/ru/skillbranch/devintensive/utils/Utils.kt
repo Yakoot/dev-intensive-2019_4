@@ -1,5 +1,8 @@
 package ru.skillbranch.devintensive.utils
 
+import android.content.Context
+import android.util.TypedValue
+
 val dictionary: MutableMap<String, String> = mutableMapOf(
     "а" to "a",
     "б" to "b",
@@ -65,5 +68,11 @@ object Utils {
             newStr += if (letter.isUpperCase()) newLetter.toString().capitalize() else newLetter
         }
         return newStr
+    }
+
+    fun getThemeColor(context: Context, attr: Int): Int {
+        val value = TypedValue()
+        context.theme.resolveAttribute(attr, value, true)
+        return value.data
     }
 }

@@ -8,11 +8,28 @@
         <item name="colorAccent">@color/color_accent</item>
 
         <item name="colorAccentedSurface">@color/color_primary_light</item>
-        <item name="colorIcon">@color/color_gray</item>
-        <item name="colorDivider">@color/color_divider_dark</item>
+        <item name="colorDivider">@color/color_gray</item>
+        <item name="colorIcon">@color/color_divider_dark</item>
 
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowAnimationStyle">@style/ActivityTransitions</item>
-    </style>
 
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorToolbar">@color/color_primary</item>
+        <item name="colorIndicator">@color/color_green</item>
+        <item name="colorItemBackground">@android:color/white</item>
+        <item name="colorCounter">@color/color_counter</item>
+        <item name="colorChatTitle">@color/color_primary</item>
+        <item name="colorChatText">@color/color_gray_dark</item>
+        <item name="colorChatAuthorMessage">@color/color_primary</item>
+        <item name="colorIconDone">@color/color_primary</item>
+        <item name="colorChipBackground">@color/color_primary_light</item>
+        <item name="colorChipCloseIcon">@android:color/white</item>
+        <item name="colorArchivedBackground">@color/color_primary_dark</item>
+        <item name="colorArchiveIcon">@color/color_gray</item>
+        <item name="colorArchiveOnSwipe">@color/color_primary_dark</item>
+        <item name="colorSnackbarBackground">@color/color_primary</item>
+        <item name="colorSnackbarAction">@color/color_accent</item>
+        <item name="colorSnackbarText">@android:color/white</item>
+    </style>
 </resources>
