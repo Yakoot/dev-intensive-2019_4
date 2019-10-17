@@ -75,7 +75,7 @@ class ChatAdapter(val listener: (ChatItem) -> Unit) :
 
     inner class SingleViewHolder(convertView: View) : ChatItemViewHolder(convertView), ItemTouchViewHolder {
         override fun onItemSelected() {
-            itemView.setBackgroundColor(Utils.getThemeColor(itemView.context, R.attr.colorArchiveOnSwipe))
+            itemView.setBackgroundColor(Utils.getThemeColor(itemView.context, R.attr.colorItemBackground))
         }
 
         override fun onItemCleared() {
